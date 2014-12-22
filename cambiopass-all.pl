@@ -1,17 +1,38 @@
 #!/usr/bin/perl
 
-#Description:
+# Description:  Ciclo Cambia Password da una lista hosts.txt,
+#	        oppure da un singolo host specificato nel parametro --host
 #
 #
+#------Moduli----------
 
-    use Expect;
-    use Getopt::Long;
-    use strict;
-    use warnings;
+use strict;
+use warnings;
+use Getopt::Long;
+use Expect;
 
+#---------------Controllo parametri----------------
+if (scalar @ARGV < 2) {
+	print "\n Usage: $0 [OPTION]\n\n --username  (default: current user) \n --currentpass \n --newpass \n --host (default: hosts.txt)\n\n";
+	exit 0;
+}
 
-#    $Expect::Debug = 1;
+#Variabili:
+#-----------------------------------------
+my $username = $ENV{USER};
+my $currentpass;
+my $newpass;
+my $host;  
+#-----------------------------------------
 
+#Def Parametri:
+GetOptions(
+
+	"username=s"	=> \$username,
+	"currentpass=s"	=> \$currentpass,
+	"newpass=s"	=> \$newpass,
+	"host=s"	=> \$host   
+);
 
 #---------------Subroutine----------------------------------------
 
@@ -57,42 +78,54 @@ sub cambia_password {
 
 
 }
+#----------------------------Fine Sub-------------------------
 
 
-#---------------Master Code-------------------------------------
+#---------------------------CODE-------------------------------
 
-if (scalar @ARGV == 1) {
-print "\n Use: $0 --username <...> --currentpass <...> --newpass <...> --host <...> \n";
-	exit 0;
+
+
+
+if ($host) {
+
+	#cambia_password($username, $currentpass, $newpass, $host);
+	print "\n\nRinnovo password avvenuto con successo: singolo host: $host \n";	
+	print "User: $username\n";
+	print "Current pass: $currentpass ---> New pass: $newpass\n";
+
+} else {	
+	
+	open (FILE, 'hosts.txt')
+	  || die "Impossibile aprire il file: $!\n";
+	  
+	while (<FILE>) {
+		chomp $_;
+		#cambia_password($username, $currentpass, $newpass, $_);
+		print "\n\nRinnovo password avvenuto con successo ---> host:  $_ \n";	
+		print "User: $username\n";
+		print "Current pass: $currentpass ---> New pass: $newpass\n";
 }
 
-my $username;  
-my $currentpass;
-my $newpass; 
-my $host;
+	close (FILE);
+}
 
 
-#Varibili di input di default::
-#	my $username  = 'pippo';
-#	my $currentpass = 'perldidefault';
-#	my $newpass = 'perldipippo';
-#	my $host = '10.0.3.214';
 
 
-GetOptions(
-
-	"username=s"	=> \$username,
-	"currentpass=s"	=> \$currentpass,
-	"newpass=s"	=> \$newpass,
-	"host=s"	=> \$host
 
 
-);
 
 
-cambia_password($username, $currentpass, $newpass, $host);
 
-print "$? è successo!!\n";
+
+
+
+
+
+
+
+
+
 
 
 
